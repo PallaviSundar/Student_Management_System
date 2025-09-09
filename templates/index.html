@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+        a.button, button {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 5px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        a.button.delete {
+            background-color: #dc3545;
+        }
+        a.button.edit {
+            background-color: #ffc107;
+            color: #000;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Management System</h1>
+        <a href="#" class="button" id="showForm">Add New Student</a>
+
+        <!-- Add/Edit Student Form -->
+        <div class="form-container" id="studentFormContainer">
+            <form id="studentForm" method="POST">
+                <input type="hidden" name="id" id="studentId">
+                <input type="text" name="name" id="name" placeholder="Name" required>
+                <input type="number" name="age" id="age" placeholder="Age" required>
+                <input type="text" name="grade" id="grade" placeholder="Grade" required>
+                <button type="submit" id="submitButton">Add Student</button>
+            </form>
+        </div>
+
+        <!-- Students Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Grade</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.age }}</td>
+                    <td>{{ student.grade }}</td>
+                    <td>
+                        <a href="#" class="button edit" onclick="editStudent('{{ student.id }}','{{ student.name }}','{{ student.age }}','{{ student.grade }}')">Edit</a>
+                        <a href="{{ url_for('delete_student', id=student.id) }}" class="button delete" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No students found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const showFormBtn = document.getElementById('showForm');
+        const formContainer = document.getElementById('studentFormContainer');
+        const form = document.getElementById('studentForm');
+        const submitButton = document.getElementById('submitButton');
+        const studentIdField = document.getElementById('studentId');
+        const nameField = document.getElementById('name');
+        const ageField = document.getElementById('age');
+        const gradeField = document.getElementById('grade');
+
+        // Toggle form
+        showFormBtn.addEventListener('click', () => {
+            resetForm();
+            form.action = "{{ url_for('add_student') }}";
+            submitButton.textContent = "Add Student";
+            formContainer.style.display = formContainer.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Load form with student data for editing
+        function editStudent(id, name, age, grade) {
+            studentIdField.value = id;
+            nameField.value = name;
+            ageField.value = age;
+            gradeField.value = grade;
+            form.action = "/edit/" + id;
+            submitButton.textContent = "Update Student";
+            formContainer.style.display = 'block';
+        }
+
+        // Reset form for adding
+        function resetForm() {
+            studentIdField.value = "";
+            nameField.value = "";
+            ageField.value = "";
+            gradeField.value = "";
+        }
+    </script>
+</body>
+</html>
+
+
